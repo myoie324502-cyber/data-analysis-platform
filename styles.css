@@ -8,6 +8,8 @@
     --border: #e5e5e0;
     --success: #7c9e8a;
     --danger: #c97169;
+    --code-bg: #282c34;
+    --code-text: #abb2bf;
 }
 
 * {
@@ -309,6 +311,20 @@ body {
     transform: translateY(-2px);
 }
 
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 0.85em;
+}
+
+.btn-copy {
+    background: var(--accent);
+    color: white;
+}
+
+.btn-copy:hover {
+    background: var(--primary);
+}
+
 /* 图表区域 */
 .charts-section {
     margin-top: 30px;
@@ -385,10 +401,147 @@ body {
     margin-bottom: 15px;
 }
 
+/* R 代码板块 */
+.r-code-section {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.02) 0%, rgba(212, 165, 116, 0.02) 100%);
+}
+
+.r-code-header {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+}
+
+.r-code-header h2 {
+    font-size: 1.5em;
+    margin-bottom: 8px;
+    color: var(--dark);
+    font-weight: 700;
+}
+
+.r-code-header p {
+    color: var(--primary);
+    font-size: 0.95em;
+}
+
+/* 标签页样式 */
+.r-code-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+}
+
+.r-code-tab {
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 0.95em;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.r-code-tab:hover {
+    color: var(--dark);
+    background: rgba(212, 165, 116, 0.1);
+}
+
+.r-code-tab.active {
+    color: var(--secondary);
+    border-bottom-color: var(--secondary);
+}
+
+/* 代码容器 */
+.r-code-container {
+    background: var(--code-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.r-code-content {
+    display: none;
+    padding: 20px;
+}
+
+.r-code-content.active {
+    display: block;
+}
+
+.code-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.code-title {
+    color: #61dafb;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.r-code-content pre {
+    margin: 0;
+    background: transparent;
+    color: var(--code-text);
+    font-size: 0.85em;
+    line-height: 1.6;
+    overflow-x: auto;
+}
+
+.r-code-content code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+/* 提示框 */
+.r-code-tips {
+    background: rgba(212, 165, 116, 0.1);
+    border-left: 4px solid var(--secondary);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.r-code-tips h3 {
+    margin-bottom: 12px;
+    color: var(--dark);
+    font-size: 1em;
+}
+
+.r-code-tips ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.r-code-tips li {
+    margin-bottom: 8px;
+    color: var(--primary);
+    font-size: 0.9em;
+    line-height: 1.5;
+}
+
+.r-code-tips strong {
+    color: var(--dark);
+}
+
 /* 导出区域 */
 .export-section {
     text-align: center;
     background: linear-gradient(135deg, rgba(124, 158, 138, 0.05) 0%, rgba(107, 114, 128, 0.05) 100%);
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.export-section .btn {
+    margin: 0;
 }
 
 /* 模态框 */
@@ -413,8 +566,8 @@ body {
     background: white;
     border-radius: 16px;
     width: 90%;
-    max-width: 600px;
-    max-height: 80vh;
+    max-width: 800px;
+    max-height: 85vh;
     display: flex;
     flex-direction: column;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -431,6 +584,7 @@ body {
 .modal-header h3 {
     margin: 0;
     color: var(--dark);
+    font-size: 1.3em;
 }
 
 .modal-close {
@@ -439,6 +593,11 @@ body {
     font-size: 1.5em;
     cursor: pointer;
     color: var(--primary);
+    transition: color 0.3s;
+}
+
+.modal-close:hover {
+    color: var(--dark);
 }
 
 .modal-body {
@@ -447,15 +606,53 @@ body {
     flex: 1;
 }
 
-.modal-body pre {
-    background: var(--light);
+/* 模态框标签页 */
+.modal-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border);
+}
+
+.modal-tab {
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--primary);
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.modal-tab:hover {
+    color: var(--dark);
+}
+
+.modal-tab.active {
+    color: var(--secondary);
+    border-bottom-color: var(--secondary);
+}
+
+.modal-code-content {
+    display: none;
+    background: var(--code-bg);
     padding: 16px;
     border-radius: 8px;
-    overflow-x: auto;
     margin-bottom: 20px;
-    font-size: 0.85em;
+    color: var(--code-text);
+    font-size: 0.8em;
     line-height: 1.5;
-    color: var(--dark);
+    overflow-x: auto;
+}
+
+.modal-code-content.active {
+    display: block;
+}
+
+.modal-code-content code {
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
 }
 
 /* 响应式布局 */
@@ -493,4 +690,53 @@ body {
         padding: 12px 8px;
         font-size: 0.9em;
     }
+
+    .r-code-tabs {
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .r-code-tab {
+        padding: 10px 15px;
+        font-size: 0.85em;
+    }
+
+    .r-code-content pre {
+        font-size: 0.75em;
+    }
+
+    .export-section {
+        flex-direction: column;
+    }
+
+    .export-section .btn {
+        width: 100%;
+    }
+}
+
+/* Highlight.js 代码高亮样式 */
+.hljs {
+    background: transparent;
+    color: var(--code-text);
+}
+
+.hljs-attr,
+.hljs-attribute {
+    color: #e06c75;
+}
+
+.hljs-string {
+    color: #98c379;
+}
+
+.hljs-number {
+    color: #d19a66;
+}
+
+.hljs-literal {
+    color: #56b6c2;
+}
+
+.hljs-function {
+    color: #61dafb;
 }
