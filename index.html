@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据分析平台 - Excel 数据可视化工具</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <header class="header">
+            <div class="header-content">
+                <h1>📊 数据分析平台</h1>
+                <p>智能 Excel 数据可视化工具</p>
+            </div>
+        </header>
+
+        <!-- 上传区域 -->
+        <section class="upload-section card">
+            <div class="upload-box" id="uploadBox">
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <h3>上传 Excel 文件</h3>
+                <p>支持 .xlsx 格式，拖拽或点击上传</p>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" hidden>
+            </div>
+            <div id="uploadStatus" class="upload-status"></div>
+        </section>
+
+        <!-- 控制面板 -->
+        <section id="controlPanel" class="control-panel card" style="display: none;">
+            <div class="control-row">
+                <div class="control-group">
+                    <label>选择工作表</label>
+                    <select id="sheetSelector" class="input-select">
+                        <option>请选择工作表</option>
+                    </select>
+                </div>
+                <div class="control-group flex-grow">
+                    <label>搜索数据</label>
+                    <input type="text" id="searchInput" class="input-text" placeholder="输入关键词搜索...">
+                </div>
+            </div>
+        </section>
+
+        <!-- 数据表格区域 -->
+        <section id="tableSection" class="table-section card" style="display: none;">
+            <h2>数据表格</h2>
+            <div class="table-wrapper">
+                <table id="dataTable" class="data-table">
+                    <thead></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 图表配置区域 -->
+        <section id="chartConfig" class="chart-config card" style="display: none;">
+            <h2>图表配置</h2>
+            <div class="config-grid">
+                <div class="config-item">
+                    <label>X轴（分类）</label>
+                    <select id="xAxisSelect" class="input-select">
+                        <option>选择列</option>
+                    </select>
+                </div>
+                <div class="config-item">
+                    <label>Y轴（数值）</label>
+                    <select id="yAxisSelect" class="input-select">
+                        <option>选择列</option>
+                    </select>
+                </div>
+                <div class="config-item">
+                    <label>图表类型</label>
+                    <select id="chartTypeSelect" class="input-select">
+                        <option value="bar">柱状图</option>
+                        <option value="line">折线图</option>
+                        <option value="pie">饼图</option>
+                    </select>
+                </div>
+                <button id="generateChartBtn" class="btn btn-primary">生成图表</button>
+            </div>
+        </section>
+
+        <!-- 图表显示区域 -->
+        <section id="chartsSection" class="charts-section" style="display: none;">
+            <div id="chartsContainer" class="charts-container"></div>
+        </section>
+
+        <!-- 导出区域 -->
+        <section id="exportSection" class="export-section card" style="display: none;">
+            <button id="exportPdfBtn" class="btn btn-success">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54h3.58l4.29-6.04h-3.15l-1.97 2.5z"/>
+                </svg>
+                导出为 PDF
+            </button>
+        </section>
+    </div>
+
+    <!-- R代码模态框 -->
+    <div id="rCodeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>R 语言代码</h3>
+                <button class="modal-close" onclick="closeRCodeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <pre id="rCodeContent"></pre>
+                <button class="btn btn-primary" onclick="copyRCode()">复制代码</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

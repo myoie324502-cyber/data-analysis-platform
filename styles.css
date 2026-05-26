@@ -1,0 +1,496 @@
+:root {
+    --primary: #6b7280;
+    --secondary: #d4a574;
+    --accent: #a0937d;
+    --light: #f5f5f0;
+    --lighter: #fafaf8;
+    --dark: #2c2c2c;
+    --border: #e5e5e0;
+    --success: #7c9e8a;
+    --danger: #c97169;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+    background: linear-gradient(135deg, #f5f5f0 0%, #fafaf8 100%);
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+/* 页面头部 */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.05) 0%, rgba(212, 165, 116, 0.05) 100%);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+}
+
+.header-content h1 {
+    font-size: 2.5em;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 10px;
+}
+
+.header-content p {
+    font-size: 1.1em;
+    color: var(--primary);
+}
+
+/* 卡片样式 */
+.card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    margin-bottom: 30px;
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+/* 上传区域 */
+.upload-section {
+    text-align: center;
+}
+
+.upload-box {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 60px 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--lighter);
+}
+
+.upload-box:hover {
+    border-color: var(--secondary);
+    background: rgba(212, 165, 116, 0.05);
+}
+
+.upload-box.dragover {
+    border-color: var(--secondary);
+    background: rgba(212, 165, 116, 0.1);
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    width: 60px;
+    height: 60px;
+    color: var(--secondary);
+    margin-bottom: 20px;
+    stroke-width: 1.5;
+}
+
+.upload-box h3 {
+    font-size: 1.3em;
+    margin-bottom: 8px;
+    color: var(--dark);
+}
+
+.upload-box p {
+    color: var(--primary);
+    font-size: 0.95em;
+}
+
+.upload-status {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    display: none;
+}
+
+.upload-status.success {
+    background: rgba(124, 158, 138, 0.1);
+    color: var(--success);
+    border: 1px solid var(--success);
+    display: block;
+}
+
+.upload-status.error {
+    background: rgba(201, 113, 105, 0.1);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+    display: block;
+}
+
+/* 控制面板 */
+.control-panel {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.02) 0%, rgba(212, 165, 116, 0.02) 100%);
+}
+
+.control-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.control-group.flex-grow {
+    flex-grow: 1;
+}
+
+.control-group label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--dark);
+    font-size: 0.9em;
+}
+
+/* 输入框样式 */
+.input-select,
+.input-text {
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-family: inherit;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.input-select:focus,
+.input-text:focus {
+    outline: none;
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(212, 165, 116, 0.1);
+}
+
+.input-select {
+    cursor: pointer;
+}
+
+/* 表格样式 */
+.table-section {
+    margin-top: 30px;
+}
+
+.table-section h2 {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: linear-gradient(135deg, rgba(107, 114, 128, 0.05) 0%, rgba(212, 165, 116, 0.05) 100%);
+}
+
+.data-table th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--dark);
+    border-bottom: 2px solid var(--border);
+    white-space: nowrap;
+}
+
+.data-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--primary);
+}
+
+.data-table tbody tr:hover {
+    background: rgba(212, 165, 116, 0.03);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 图表配置 */
+.chart-config {
+    background: linear-gradient(135deg, rgba(212, 165, 116, 0.02) 0%, rgba(160, 147, 125, 0.02) 100%);
+}
+
+.chart-config h2 {
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.config-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.config-item label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--dark);
+    font-size: 0.9em;
+}
+
+/* 按钮样式 */
+.btn {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.95em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(107, 114, 128, 0.3);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success) 0%, #6b8b7c 100%);
+    color: white;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(124, 158, 138, 0.3);
+}
+
+.btn-secondary {
+    background: var(--light);
+    color: var(--dark);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
+    background: var(--border);
+    transform: translateY(-2px);
+}
+
+/* 图表区域 */
+.charts-section {
+    margin-top: 30px;
+}
+
+.charts-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 30px;
+}
+
+.chart-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+    border: 1px solid var(--border);
+    transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.chart-header h3 {
+    font-size: 1.1em;
+    color: var(--dark);
+    margin: 0;
+}
+
+.chart-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.chart-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    padding: 0;
+}
+
+.chart-btn:hover {
+    background: var(--light);
+    border-color: var(--secondary);
+}
+
+.chart-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--dark);
+    stroke-width: 1.5;
+}
+
+.chart-canvas-container {
+    position: relative;
+    height: 300px;
+    margin-bottom: 15px;
+}
+
+/* 导出区域 */
+.export-section {
+    text-align: center;
+    background: linear-gradient(135deg, rgba(124, 158, 138, 0.05) 0%, rgba(107, 114, 128, 0.05) 100%);
+}
+
+/* 模态框 */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--dark);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    color: var(--primary);
+}
+
+.modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.modal-body pre {
+    background: var(--light);
+    padding: 16px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: var(--dark);
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .container {
+        padding: 20px 15px;
+    }
+
+    .header-content h1 {
+        font-size: 1.8em;
+    }
+
+    .card {
+        padding: 20px;
+    }
+
+    .control-row {
+        grid-template-columns: 1fr;
+    }
+
+    .config-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .charts-container {
+        grid-template-columns: 1fr;
+    }
+
+    .upload-box {
+        padding: 40px 20px;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: 12px 8px;
+        font-size: 0.9em;
+    }
+}
