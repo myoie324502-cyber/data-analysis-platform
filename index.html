@@ -8,6 +8,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -95,6 +97,55 @@
             <div id="chartsContainer" class="charts-container"></div>
         </section>
 
+        <!-- R语言代码板块 -->
+        <section id="rCodeSection" class="r-code-section card" style="display: none;">
+            <div class="r-code-header">
+                <h2>💻 R 语言代码生成</h2>
+                <p>基于当前图表配置自动生成的 R 代码</p>
+            </div>
+            
+            <div class="r-code-tabs">
+                <button class="r-code-tab active" data-tab="ggplot2">ggplot2</button>
+                <button class="r-code-tab" data-tab="base">Base R</button>
+                <button class="r-code-tab" data-tab="plotly">Plotly</button>
+            </div>
+
+            <div class="r-code-container">
+                <div id="rCodeGgplot2" class="r-code-content active">
+                    <div class="code-header">
+                        <span class="code-title">ggplot2 版本</span>
+                        <button class="btn btn-sm btn-copy" onclick="copyRCode('ggplot2')">复制</button>
+                    </div>
+                    <pre><code id="rCodeGgplot2Content" class="language-r"></code></pre>
+                </div>
+
+                <div id="rCodeBase" class="r-code-content">
+                    <div class="code-header">
+                        <span class="code-title">Base R 版本</span>
+                        <button class="btn btn-sm btn-copy" onclick="copyRCode('base')">复制</button>
+                    </div>
+                    <pre><code id="rCodeBaseContent" class="language-r"></code></pre>
+                </div>
+
+                <div id="rCodePlotly" class="r-code-content">
+                    <div class="code-header">
+                        <span class="code-title">Plotly 版本（交互式）</span>
+                        <button class="btn btn-sm btn-copy" onclick="copyRCode('plotly')">复制</button>
+                    </div>
+                    <pre><code id="rCodePlotlyContent" class="language-r"></code></pre>
+                </div>
+            </div>
+
+            <div class="r-code-tips">
+                <h3>📝 使用提示</h3>
+                <ul>
+                    <li><strong>ggplot2</strong> - 最流行的可视化库，适合学术论文和专业报告</li>
+                    <li><strong>Base R</strong> - R 的原生绘图函数，无需额外安装包</li>
+                    <li><strong>Plotly</strong> - 交互式图表，适合动态演示和网页应用</li>
+                </ul>
+            </div>
+        </section>
+
         <!-- 导出区域 -->
         <section id="exportSection" class="export-section card" style="display: none;">
             <button id="exportPdfBtn" class="btn btn-success">
@@ -103,10 +154,17 @@
                 </svg>
                 导出为 PDF
             </button>
+            <button id="exportRCodeBtn" class="btn btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                    <polyline points="13 2 13 9 20 9"/>
+                </svg>
+                导出 R 代码
+            </button>
         </section>
     </div>
 
-    <!-- R代码模态框 -->
+    <!-- R代码模态框（用于图表内快速查看） -->
     <div id="rCodeModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -114,8 +172,15 @@
                 <button class="modal-close" onclick="closeRCodeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <pre id="rCodeContent"></pre>
-                <button class="btn btn-primary" onclick="copyRCode()">复制代码</button>
+                <div class="modal-tabs">
+                    <button class="modal-tab active" onclick="switchModalTab('modal-ggplot2')">ggplot2</button>
+                    <button class="modal-tab" onclick="switchModalTab('modal-base')">Base R</button>
+                    <button class="modal-tab" onclick="switchModalTab('modal-plotly')">Plotly</button>
+                </div>
+                <pre id="modal-ggplot2" class="modal-code-content active"><code id="rCodeModalContent" class="language-r"></code></pre>
+                <pre id="modal-base" class="modal-code-content"><code id="rCodeModalBaseContent" class="language-r"></code></pre>
+                <pre id="modal-plotly" class="modal-code-content"><code id="rCodeModalPlotlyContent" class="language-r"></code></pre>
+                <button class="btn btn-primary" onclick="copyModalRCode()">复制代码</button>
             </div>
         </div>
     </div>
