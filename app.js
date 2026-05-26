@@ -4,6 +4,8 @@ let currentSheet = null;
 let currentData = [];
 let filteredData = [];
 let charts = [];
+let currentRCode = { ggplot2: '', base: '', plotly: '' };
+let currentModalRCode = { ggplot2: '', base: '', plotly: '' };
 
 // 初始化
 document.addEventListener('DOMContentLoaded', () => {
@@ -17,6 +19,7 @@ function initializeEventListeners() {
     const searchInput = document.getElementById('searchInput');
     const generateChartBtn = document.getElementById('generateChartBtn');
     const exportPdfBtn = document.getElementById('exportPdfBtn');
+    const exportRCodeBtn = document.getElementById('exportRCodeBtn');
 
     // 上传事件
     uploadBox.addEventListener('click', () => fileInput.click());
@@ -42,6 +45,27 @@ function initializeEventListeners() {
 
     // 导出PDF
     exportPdfBtn.addEventListener('click', exportToPdf);
+
+    // 导出R代码
+    if (exportRCodeBtn) {
+        exportRCodeBtn.addEventListener('click', exportRCodeToFile);
+    }
+
+    // R代码标签页切换
+    const rCodeTabs = document.querySelectorAll('.r-code-tab');
+    rCodeTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            switchRCodeTab(e.target.dataset.tab);
+        });
+    });
+
+    // 模态框标签页
+    const modalTabs = document.querySelectorAll('.modal-tab');
+    modalTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            switchModalTab(e.target.textContent.toLowerCase());
+        });
+    });
 }
 
 // 拖拽上传处理
@@ -359,6 +383,12 @@ function generateChart() {
         yAxis: yAxis,
         data: chartData
     });
+
+    // 显示R代码板块
+    document.getElementById('rCodeSection').style.display = 'block';
+    
+    // 生成R代码
+    generateAllRCodes(chartType, xAxis, yAxis);
 }
 
 // 准备图表数据
@@ -402,11 +432,12 @@ function exportChartImage(chartId) {
     link.click();
 }
 
-// 显示R代码
+// 显示R代码模态框
 function showRCode(chartType, xAxis, yAxis) {
-    const rCode = generateRCode(chartType, xAxis, yAxis);
-    document.getElementById('rCodeContent').textContent = rCode;
+    generateModalRCodes(chartType, xAxis, yAxis);
     document.getElementById('rCodeModal').classList.add('show');
+    // 默认显示第一个标签
+    switchModalTab('ggplot2');
 }
 
 // 关闭R代码模态框
@@ -414,60 +445,289 @@ function closeRCodeModal() {
     document.getElementById('rCodeModal').classList.remove('show');
 }
 
-// 复制R代码
-function copyRCode() {
-    const code = document.getElementById('rCodeContent').textContent;
-    navigator.clipboard.writeText(code).then(() => {
-        alert('代码已复制到剪贴板');
-    });
+// 生成所有版本的R代码
+function generateAllRCodes(chartType, xAxis, yAxis) {
+    currentRCode = {
+        ggplot2: generateRCodeGgplot2(chartType, xAxis, yAxis),
+        base: generateRCodeBase(chartType, xAxis, yAxis),
+        plotly: generateRCodePlotly(chartType, xAxis, yAxis)
+    };
+
+    // 更新R代码板块
+    document.getElementById('rCodeGgplot2Content').textContent = currentRCode.ggplot2;
+    document.getElementById('rCodeBaseContent').textContent = currentRCode.base;
+    document.getElementById('rCodePlotlyContent').textContent = currentRCode.plotly;
+
+    // 代码高亮
+    if (typeof hljs !== 'undefined') {
+        document.querySelectorAll('.r-code-content code').forEach(block => {
+            hljs.highlightElement(block);
+        });
+    }
 }
 
-// 生成R代码
-function generateRCode(chartType, xAxis, yAxis) {
-    let code = `# 数据导入
-df <- read.xlsx("your_file.xlsx")
+// 生成模态框中的R代码
+function generateModalRCodes(chartType, xAxis, yAxis) {
+    currentModalRCode = {
+        ggplot2: generateRCodeGgplot2(chartType, xAxis, yAxis),
+        base: generateRCodeBase(chartType, xAxis, yAxis),
+        plotly: generateRCodePlotly(chartType, xAxis, yAxis)
+    };
+
+    document.getElementById('rCodeModalContent').textContent = currentModalRCode.ggplot2;
+    document.getElementById('rCodeModalBaseContent').textContent = currentModalRCode.base;
+    document.getElementById('rCodeModalPlotlyContent').textContent = currentModalRCode.plotly;
+}
+
+// ggplot2 版本
+function generateRCodeGgplot2(chartType, xAxis, yAxis) {
+    let code = `# 加载必要的库
+library(dplyr)
+library(ggplot2)
+library(readxl)
+
+# 数据导入
+df <- read_excel("your_file.xlsx")
 
 # 数据处理
 data_summary <- df %>%
   group_by(${xAxis}) %>%
   summarise(${yAxis} = sum(${yAxis}, na.rm = TRUE))
 
-# 绘制${chartType === 'bar' ? '柱状图' : chartType === 'line' ? '折线图' : '饼图'}
-`;
+# 绘制${chartType === 'bar' ? '柱状图' : chartType === 'line' ? '折线图' : '饼图'}\n`;
 
     if (chartType === 'bar') {
-        code += `ggplot(data_summary, aes(x = ${xAxis}, y = ${yAxis})) +
+        code += `ggplot(data_summary, aes(x = reorder(${xAxis}, -${yAxis}), y = ${yAxis})) +
   geom_col(fill = '#6b7280', color = '#6b7280', alpha = 0.8) +
+  geom_text(aes(label = round(${yAxis}, 2)), vjust = -0.5, size = 3) +
   theme_minimal() +
   labs(title = '${xAxis} vs ${yAxis}',
+       subtitle = '数据分析可视化',
        x = '${xAxis}',
-       y = '${yAxis}') +
-  theme(plot.title = element_text(size = 14, face = 'bold'),
-        axis.text.x = element_text(angle = 45, hjust = 1))`;
+       y = '${yAxis}',
+       caption = paste('Generated on', Sys.Date())) +
+  theme(plot.title = element_text(size = 14, face = 'bold', hjust = 0.5),
+        plot.subtitle = element_text(size = 11, hjust = 0.5),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+        panel.grid.major.x = element_blank())`;
     } else if (chartType === 'line') {
-        code += `ggplot(data_summary, aes(x = ${xAxis}, y = ${yAxis})) +
+        code += `ggplot(data_summary, aes(x = ${xAxis}, y = ${yAxis}, group = 1)) +
   geom_line(color = '#d4a574', size = 1) +
   geom_point(color = '#d4a574', size = 3) +
+  geom_text(aes(label = round(${yAxis}, 2)), vjust = -0.8, size = 3) +
   theme_minimal() +
-  labs(title = '${xAxis} vs ${yAxis}',
+  labs(title = '${xAxis} vs ${yAxis} - 趋势分析',
+       subtitle = '随时间或分类的变化趋势',
        x = '${xAxis}',
-       y = '${yAxis}') +
-  theme(plot.title = element_text(size = 14, face = 'bold'),
+       y = '${yAxis}',
+       caption = paste('Generated on', Sys.Date())) +
+  theme(plot.title = element_text(size = 14, face = 'bold', hjust = 0.5),
+        plot.subtitle = element_text(size = 11, hjust = 0.5),
         axis.text.x = element_text(angle = 45, hjust = 1))`;
     } else {
-        code += `pie_data <- data_summary %>%
-  mutate(percentage = ${yAxis} / sum(${yAxis}) * 100)
+        code += `# 饼图数据处理
+pie_data <- data_summary %>%
+  mutate(percentage = round(${yAxis} / sum(${yAxis}) * 100, 2),
+         label = paste0(${xAxis}, '\\n', percentage, '%'))
 
+# 绘制饼图
 ggplot(pie_data, aes(x = "", y = ${yAxis}, fill = ${xAxis})) +
-  geom_col() +
+  geom_col(width = 1) +
+  geom_text(aes(label = label), position = position_stack(vjust = 0.5), size = 3) +
   coord_polar(theta = "y") +
   theme_void() +
-  labs(title = '${xAxis} 分布占比',
-       fill = '${xAxis}') +
-  theme(plot.title = element_text(size = 14, face = 'bold'))`;
+  labs(title = '${xAxis} 分布占比分析',
+       fill = '${xAxis}',
+       caption = paste('Generated on', Sys.Date())) +
+  theme(plot.title = element_text(size = 14, face = 'bold', hjust = 0.5),
+        legend.position = 'right')`;
     }
 
     return code;
+}
+
+// Base R 版本
+function generateRCodeBase(chartType, xAxis, yAxis) {
+    let code = `# Base R 绘图
+# 数据导入与处理
+df <- read.csv("your_file.csv")
+data_summary <- aggregate(${yAxis} ~ ${xAxis}, data = df, FUN = sum)
+
+# 绘制${chartType === 'bar' ? '柱状图' : chartType === 'line' ? '折线图' : '饼图'}\n`;
+
+    if (chartType === 'bar') {
+        code += `par(mar = c(5, 4, 4, 2))
+barplot(data_summary$${yAxis}, 
+        names.arg = data_summary$${xAxis},
+        main = '${xAxis} vs ${yAxis}',
+        xlab = '${xAxis}',
+        ylab = '${yAxis}',
+        col = '#6b7280',
+        border = NA,
+        las = 2)
+grid(NA, NULL)`;
+    } else if (chartType === 'line') {
+        code += `par(mar = c(5, 4, 4, 2))
+plot(data_summary$${xAxis}, 
+     data_summary$${yAxis},
+     type = 'b',
+     main = '${xAxis} vs ${yAxis} - 趋势',
+     xlab = '${xAxis}',
+     ylab = '${yAxis}',
+     col = '#d4a574',
+     pch = 19,
+     lwd = 2)
+grid(NULL, NULL, lty = 2, col = 'gray')`;
+    } else {
+        code += `pie(data_summary$${yAxis},
+    labels = data_summary$${xAxis},
+    main = '${xAxis} 分布占比',
+    col = c('#6b7280', '#d4a574', '#a0937d', '#7c9e8a', '#c97169'),
+    percentage = TRUE)`;
+    }
+
+    return code;
+}
+
+// Plotly 交互式版本
+function generateRCodePlotly(chartType, xAxis, yAxis) {
+    let code = `# 交互式绘图使用 Plotly
+library(plotly)
+library(dplyr)
+
+# 数据处理
+data_summary <- df %>%
+  group_by(${xAxis}) %>%
+  summarise(${yAxis} = sum(${yAxis}, na.rm = TRUE))
+
+# 绘制${chartType === 'bar' ? '柱状图' : chartType === 'line' ? '折线图' : '饼图'}\n`;
+
+    if (chartType === 'bar') {
+        code += `plot_ly(data_summary, 
+        x = ~${xAxis}, 
+        y = ~${yAxis},
+        type = 'bar',
+        marker = list(color = '#6b7280')) %>%
+  layout(title = '${xAxis} vs ${yAxis}',
+         xaxis = list(title = '${xAxis}'),
+         yaxis = list(title = '${yAxis}'),
+         showlegend = FALSE,
+         hovermode = 'x unified')`;
+    } else if (chartType === 'line') {
+        code += `plot_ly(data_summary,
+        x = ~${xAxis},
+        y = ~${yAxis},
+        type = 'scatter',
+        mode = 'lines+markers',
+        line = list(color = '#d4a574', width = 2),
+        marker = list(color = '#d4a574', size = 8)) %>%
+  layout(title = '${xAxis} vs ${yAxis} - 趋势分析',
+         xaxis = list(title = '${xAxis}'),
+         yaxis = list(title = '${yAxis}'),
+         hovermode = 'x unified')`;
+    } else {
+        code += `plot_ly(data_summary,
+        labels = ~${xAxis},
+        values = ~${yAxis},
+        type = 'pie',
+        marker = list(colors = c('#6b7280', '#d4a574', '#a0937d', '#7c9e8a'))) %>%
+  layout(title = '${xAxis} 分布占比分析')`;
+    }
+
+    return code;
+}
+
+// R代码板块标签页切换
+function switchRCodeTab(tab) {
+    // 隐藏所有内容
+    document.querySelectorAll('.r-code-content').forEach(el => {
+        el.classList.remove('active');
+    });
+    // 移除所有标签的active类
+    document.querySelectorAll('.r-code-tab').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    // 显示选中的内容和标签
+    document.getElementById(`rCode${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+    event.target.classList.add('active');
+}
+
+// 模态框标签页切换
+function switchModalTab(tab) {
+    // 隐藏所有内容
+    document.querySelectorAll('.modal-code-content').forEach(el => {
+        el.classList.remove('active');
+    });
+    // 移除所有标签的active类
+    document.querySelectorAll('.modal-tab').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    // 显示选中的内容和标签
+    const contentId = `modal-${tab}`;
+    const element = document.getElementById(contentId);
+    if (element) {
+        element.classList.add('active');
+    }
+    
+    // 标记当前标签为active
+    event.target?.classList.add('active');
+}
+
+// 复制R代码
+function copyRCode(type = 'ggplot2') {
+    const code = currentRCode[type];
+    navigator.clipboard.writeText(code).then(() => {
+        alert('代码已复制到剪贴板！');
+    }).catch(() => {
+        alert('复制失败，请手动复制');
+    });
+}
+
+// 复制模态框中的R代码
+function copyModalRCode() {
+    // 获取当前显示的标签页
+    const activeTab = document.querySelector('.modal-tab.active');
+    const tab = activeTab?.textContent.toLowerCase() || 'ggplot2';
+    copyRCode(tab);
+}
+
+// 导出R代码到文件
+function exportRCodeToFile() {
+    if (Object.values(currentRCode).every(code => code === '')) {
+        alert('请先生成图表和R代码');
+        return;
+    }
+
+    let content = `# 数据分析 R 代码导出
+# 生成时间: ${new Date().toLocaleString()}
+# 工作表: ${currentSheet}
+\n`;
+
+    content += `# ============================================\n`;
+    content += `# ggplot2 版本（推荐用于学术论文）\n`;
+    content += `# ============================================\n`;
+    content += currentRCode.ggplot2 + '\n\n';
+
+    content += `# ============================================\n`;
+    content += `# Base R 版本（无需额外包）\n`;
+    content += `# ============================================\n`;
+    content += currentRCode.base + '\n\n';
+
+    content += `# ============================================\n`;
+    content += `# Plotly 版本（交互式）\n`;
+    content += `# ============================================\n`;
+    content += currentRCode.plotly + '\n';
+
+    // 创建下载链接
+    const element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+    element.setAttribute('download', `R_code_${Date.now()}.R`);
+    element.style.display = 'none';
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
 }
 
 // 导出为PDF
@@ -479,7 +739,6 @@ async function exportToPdf() {
         format: 'a4'
     });
 
-    const elements = document.querySelectorAll('.table-wrapper, .chart-card');
     const pageHeight = pdf.internal.pageSize.getHeight();
     const pageWidth = pdf.internal.pageSize.getWidth();
     let yPosition = 10;
